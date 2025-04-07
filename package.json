@@ -94,7 +94,7 @@
     "swagger-ui-dist": "5.20.7",
     "ts-jest": "29.3.1",
     "tsup": "8.4.0",
-    "typescript": "5.8.2"
+    "typescript": "5.8.3"
   },
   "husky": {
     "hooks": {
