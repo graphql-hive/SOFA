@@ -77,7 +77,7 @@
     "@babel/preset-typescript": "7.27.1",
     "@types/express": "5.0.1",
     "@types/jest": "29.5.14",
-    "@types/node": "22.15.15",
+    "@types/node": "22.15.17",
     "@types/swagger-ui-dist": "3.30.5",
     "@types/yamljs": "0.2.34",
     "@types/qs": "6.9.18",
