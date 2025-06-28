@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@theguild/tailwind-config": "0.6.3",
-    "@types/node": "22.15.32",
+    "@types/node": "22.15.34",
     "@types/react": "19.1.8",
     "postcss-import": "16.1.1",
     "postcss-lightningcss": "1.0.1",
