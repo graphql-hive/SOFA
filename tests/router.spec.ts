@@ -278,7 +278,7 @@ test('should overwrite a default path and responseStatus on demand', async () =>
   expect(queryRes.status).toBe(201);
   const queryResBody = await queryRes.json();
   expect(queryResBody).toEqual(users);
-  expect(spy).lastCalledWith(
+  expect(spy).toHaveBeenLastCalledWith(
     /* source */ undefined,
     /* args */ { offset: 2, limit: 5 },
     /* context */ expect.anything(),
@@ -344,7 +344,7 @@ test('should support search params in url', async () => {
   expect(res.status).toBe(200);
   const resBody = await res.json();
   expect(resBody).toEqual(users);
-  expect(spy).lastCalledWith(
+  expect(spy).toHaveBeenLastCalledWith(
     /* source */ undefined,
     /* args */ { count: 5 },
     /* context */ expect.anything(),
@@ -492,7 +492,7 @@ test('should respect http error extensions', async () => {
 //     onRoute: spy,
 //   });
 
-//   expect(spy).toBeCalledTimes(2);
+//   expect(spy).toHaveBeenCalledTimes(2);
 //   expect(spy.mock.calls[0][0].description).toEqual('this is query');
 //   expect(spy.mock.calls[1][0].description).toEqual('this is mutation');
 // });
@@ -526,7 +526,7 @@ test('primitive true boolean in requests should be handled as true', async () =>
     method: 'POST',
     body: JSON.stringify({ arg1: true }),
   });
-  expect(spyMutation).toBeCalledWith(
+  expect(spyMutation).toHaveBeenCalledWith(
     /* source */ undefined,
     /* args */ { arg1: true },
     /* context */ expect.anything(),
@@ -534,7 +534,7 @@ test('primitive true boolean in requests should be handled as true', async () =>
   );
 
   await sofa.fetch('http://localhost:4000/api/bar?arg2=true');
-  expect(spyQuery).toBeCalledWith(
+  expect(spyQuery).toHaveBeenCalledWith(
     /* source */ undefined,
     /* args */ { arg2: true },
     /* context */ expect.anything(),
@@ -571,7 +571,7 @@ test('primitive true boolean in requests should be handled as true', async () =>
 //     },
 //   });
 
-//   expect(spy).toBeCalledTimes(2);
+//   expect(spy).toHaveBeenCalledTimes(2);
 //   expect(spy.mock.calls[0][0].description).toEqual(
 //     'this is overwritten query description'
 //   );
