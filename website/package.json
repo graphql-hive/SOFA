@@ -11,14 +11,14 @@
   "dependencies": {
     "lottie-web": "5.13.0",
     "@theguild/components": "7.6.3",
-    "next": "15.3.5",
+    "next": "15.4.1",
     "next-sitemap": "4.2.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@theguild/tailwind-config": "0.6.3",
-    "@types/node": "22.16.0",
+    "@types/node": "22.16.4",
     "@types/react": "19.1.8",
     "postcss-import": "16.1.1",
     "postcss-lightningcss": "1.0.1",
