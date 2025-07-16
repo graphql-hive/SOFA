@@ -74,8 +74,8 @@ test('should start subscriptions', async () => {
   expect(resBody).toEqual({ id: expect.any(String) });
   pubsub.publish(BOOK_ADDED, { onBook: testBook1 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(1);
-  expect(fetch).toBeCalledWith('/book', {
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch).toHaveBeenCalledWith('/book', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -92,8 +92,8 @@ test('should start subscriptions', async () => {
   });
   pubsub.publish(BOOK_ADDED, { onBook: testBook2 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(2);
-  expect(fetch).toBeCalledWith('/book', {
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(fetch).toHaveBeenCalledWith('/book', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ test('should stop subscriptions', async () => {
   const resBody = await res.json();
   pubsub.publish(BOOK_ADDED, { onBook: testBook1 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(1);
   const deleteRes = await sofa.fetch(
     `http://localhost:4000/api/webhook/${resBody.id}`,
     {
@@ -148,7 +148,7 @@ test('should stop subscriptions', async () => {
   expect(deleteRes.status).toBe(200);
   pubsub.publish(BOOK_ADDED, { onBook: testBook2 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });
 
 test('should start subscriptions with parameters', async () => {
@@ -185,8 +185,8 @@ test('should start subscriptions with parameters', async () => {
   expect(resBody).toEqual({ id: expect.any(String) });
   pubsub.publish(BOOK_ADDED, { onBookBy: testBook1 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(1);
-  expect(fetch).toBeCalledWith('/bookBy', {
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch).toHaveBeenCalledWith('/bookBy', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -203,5 +203,5 @@ test('should start subscriptions with parameters', async () => {
   });
   pubsub.publish(BOOK_ADDED, { onBookBy: testBook2 });
   await delay(1000);
-  expect(fetch).toBeCalledTimes(1);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });
