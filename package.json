@@ -91,7 +91,7 @@
     "jest": "30.2.0",
     "lint-staged": "16.2.3",
     "prettier": "3.6.2",
-    "swagger-ui-dist": "5.29.2",
+    "swagger-ui-dist": "5.29.3",
     "ts-jest": "29.4.4",
     "tsup": "8.5.0",
     "typescript": "5.9.3"
