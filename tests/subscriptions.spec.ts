@@ -3,7 +3,14 @@ jest.mock('@whatwg-node/fetch', () => {
   return {
     ...original,
     fetch: jest.fn().mockResolvedValue({
-      text: () => ({}),
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => ({}),
+      text: async () => '',
+      body: {
+        cancel: () => undefined,
+      },
     }),
   };
 });
@@ -44,7 +51,7 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-test('should start subscriptions', async () => {
+test.only('should start subscriptions', async () => {
   (fetch as jest.Mock).mockClear();
   const pubsub = createPubSub();
   const sofa = useSofa({
@@ -205,3 +212,53 @@ test('should start subscriptions with parameters', async () => {
   await delay(1000);
   expect(fetch).toHaveBeenCalledTimes(1);
 });
+
+// test('should send termination message ', async () => {
+//   (fetch as jest.Mock).mockClear();
+
+//   const pubsub = createPubSub();
+//   const sofa = useSofa({
+//     basePath: '/api',
+//     schema: createSchema({
+//       typeDefs,
+//       resolvers: {
+//         Subscription: {
+//           onBook: {
+//             subscribe: () => pubsub.subscribe(BOOK_ADDED),
+//           },
+//         },
+//       },
+//     }),
+//     webhooks: {
+//       terminationMessage: true,
+//     },
+//   });
+
+//   const res = await sofa.fetch('http://localhost:4000/api/webhook', {
+//     method: 'POST',
+//     body: JSON.stringify({
+//       subscription: 'onBook',
+//       url: '/book',
+//     }),
+//   });
+//   expect(res.status).toBe(200);
+//   const resBody = await res.json();
+//   pubsub.publish(BOOK_ADDED, { onBook: testBook1 });
+//   await delay(1000);
+//   expect(fetch).toHaveBeenCalledTimes(1);
+//   const deleteRes = await sofa.fetch(
+//     `http://localhost:4000/api/webhook/${resBody.id}`,
+//     {
+//       method: 'DELETE',
+//     }
+//   );
+//   expect(deleteRes.status).toBe(200);
+//   pubsub.publish(BOOK_ADDED, { onBook: testBook2 });
+//   await delay(1000);
+//   expect(fetch).toHaveBeenCalledTimes(2);
+//   expect(fetch).toHaveBeenLastCalledWith({
+//     method: 'POST',
+//     body: '{"extensions":{"webhook":{"termination":{"reason":"Subscription terminated"}}}}',
+//     headers: { 'Content-Type': 'application/json' },
+//   });
+// });
