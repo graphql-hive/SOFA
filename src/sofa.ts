@@ -99,11 +99,6 @@ export interface SofaConfig {
       | boolean
       | string
       | ((reason: string) => { reason: string });
-    /**
-     * Timeout for webhook requests in seconds.
-     * Default is 5 seconds.
-     */
-    timeoutSeconds?: number;
   };
 }
 

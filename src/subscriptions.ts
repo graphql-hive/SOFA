@@ -13,7 +13,7 @@ import { getOperationInfo } from './ast.js';
 import { parseVariable } from './parse.js';
 import { logger } from './logger.js';
 import { ObjMap } from 'graphql/jsutils/ObjMap.js';
-import { pipeline, Readable, Writable } from 'readable-stream';
+import { pipeline, Writable } from 'readable-stream';
 
 type SubscriptionFieldName = string;
 type ID = string;
@@ -37,8 +37,9 @@ interface BuiltOperation {
 
 interface StoredClient {
   subscriptionName: SubscriptionFieldName;
-  rx: Readable;
+  rx: AsyncIterator<any>;
   tx: Writable;
+  timeoutHandle?: NodeJS.Timeout;
 }
 
 function isAsyncIterable(obj: any): obj is AsyncIterable<any> {
@@ -121,34 +122,20 @@ export function createSubscriptionManager(sofa: Sofa) {
       throw subscriptionIterable as ExecutionResult;
     }
 
-    // In case we do not get yielded an actual readable stream
-    // we want to convert it to one
-    return Readable.from(subscriptionIterable, {
-      objectMode: true,
-      highWaterMark: 100,
-    });
+    return subscriptionIterable;
   };
 
-  const mergeTxRxStreams = (id: ID, rx: Readable, tx: Writable) => {
+  const mergeTxRxStreams = (id: ID, rx: AsyncIterable<any>, tx: Writable) => {
     pipeline(rx, tx, (err) => {
       if (err) {
         logger.error(`[Subscription] Pipeline error on ${id}: ${err.message}`);
         stop(id, 'Subscription pipeline errored out');
       }
-    });
-
-    rx.on('data', (chunk) => {
-      console.log('rx data', chunk);
-    });
-    rx.on('close', () => {
-      stop(id, 'Subscription closed by client');
-    });
-    rx.on('end', () => {
-      stop(id, 'Subscription completed, no further data available');
-    });
-    rx.on('error', (err) => {
-      logger.error(`[Subscription] Error on ${id}: ${err.message}`);
-      stop(id, 'Subscription errored out (rx)');
+      // in case the rx is done without the stop function being called (and therefore performing a deletion of the client),
+      // we want to make sure we clean up the client entry properly
+      if (clients.has(id)) {
+        stop(id, 'Subscription finished, no further data available');
+      }
     });
   };
 
@@ -179,9 +166,6 @@ export function createSubscriptionManager(sofa: Sofa) {
             headers: {
               'Content-Type': 'application/json',
             },
-            signal: AbortSignal.timeout(
-              (sofa.webhooks?.timeoutSeconds || 5) * 1000
-            ),
           });
 
           if (!response.ok) {
@@ -211,12 +195,16 @@ export function createSubscriptionManager(sofa: Sofa) {
 
     mergeTxRxStreams(id, rx, tx);
 
-    console.log(rx._readableState);
 
     clients.set(id, {
       subscriptionName,
       rx,
       tx,
+      timeoutHandle: sofa.webhooks?.maxSubscriptionWebhookLifetimeSeconds
+        ? setTimeout(() => {
+            stop(id, 'Max subscription lifetime reached');
+          }, sofa.webhooks?.maxSubscriptionWebhookLifetimeSeconds * 1000)
+        : undefined,
     });
 
     return { id };
@@ -268,8 +256,14 @@ export function createSubscriptionManager(sofa: Sofa) {
       client.tx.write(terminationMessage);
     }
 
-    // stop listening for messages on the subscription
-    client.rx.destroy();
+    if (client.timeoutHandle) {
+      clearTimeout(client.timeoutHandle);
+    }
+
+    // this terminates the rx stream
+    if (client.rx.return) {
+      await client.rx.return();
+    }
     // clear the sending stream since we are done
     client.tx.end();
     // remove the client from the map
@@ -288,7 +282,9 @@ export function createSubscriptionManager(sofa: Sofa) {
       throw new Error(`Subscription with ID '${event.id}' does not exist`);
     }
 
-    client.rx.destroy();
+    if (client.rx.return) {
+      await client.rx.return();
+    }
 
     const rx = await readableStreamFromOperationCall(
       event.id,
