@@ -13,7 +13,7 @@ import { getOperationInfo } from './ast.js';
 import { parseVariable } from './parse.js';
 import { logger } from './logger.js';
 import { ObjMap } from 'graphql/jsutils/ObjMap.js';
-import { pipeline, Writable } from 'readable-stream';
+import { pipeline, Writable } from 'stream';
 
 type SubscriptionFieldName = string;
 type ID = string;
