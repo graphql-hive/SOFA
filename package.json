@@ -65,7 +65,7 @@
     "clean": "rm -rf dist",
     "prebuild": "yarn clean",
     "build": "bob build --single",
-    "test": "jest --no-watchman --detectOpenHandles --logHeapUsage",
+    "test": "jest --no-watchman --detectOpenHandles --detectLeaks",
     "release": "yarn build && changeset publish"
   },
   "devDependencies": {

@@ -13,7 +13,6 @@ import { getOperationInfo } from './ast.js';
 import { parseVariable } from './parse.js';
 import { logger } from './logger.js';
 import { ObjMap } from 'graphql/jsutils/ObjMap.js';
-import { pipeline, Writable } from 'stream';
 
 type SubscriptionFieldName = string;
 type ID = string;
@@ -36,9 +35,9 @@ interface BuiltOperation {
 }
 
 interface StoredClient {
+  url: string;
   subscriptionName: SubscriptionFieldName;
   rx: AsyncIterator<any>;
-  tx: Writable;
   timeoutHandle?: NodeJS.Timeout;
 }
 
@@ -125,18 +124,41 @@ export function createSubscriptionManager(sofa: Sofa) {
     return subscriptionIterable;
   };
 
-  const mergeTxRxStreams = (id: ID, rx: AsyncIterable<any>, tx: Writable) => {
-    pipeline(rx, tx, (err) => {
-      if (err) {
-        logger.error(`[Subscription] Pipeline error on ${id}: ${err.message}`);
-        stop(id, 'Subscription pipeline errored out');
-      }
-      // in case the rx is done without the stop function being called (and therefore performing a deletion of the client),
-      // we want to make sure we clean up the client entry properly
-      if (clients.has(id)) {
-        stop(id, 'Subscription finished, no further data available');
-      }
+  const sendMessage = async (message: any, url: string) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(message),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to send data to ${url}: ${response.status} ${response.statusText}`
+      );
+    }
+
+    response.body?.cancel(); // We don't care about the response body but want to free up resources
+  };
+
+  const startMessaging = (id: string, url: string, rx: AsyncIterable<any>) => {
+    (async () => {
+      for await (const message of rx) {
+        try {
+          await sendMessage(message, url);
+          logger.debug(`[Subscription] Sent message to ${url}`, message);
+        } catch (error) {
+          logger.error(
+            `[Subscription] Error sending message to ${url}:`,
+            error
+          );
+          stop(id, `Subscription stopped due to delivery error`);
+          break;
+        }
+      }
+      stop(id, 'Subscription completed gracefully');
+    })();
   };
 
   const start = async (
@@ -153,53 +175,12 @@ export function createSubscriptionManager(sofa: Sofa) {
       contextValue
     );
 
-    const tx = new Writable({
-      objectMode: true,
-      highWaterMark: 100,
-      async write(message, _encoding, callback) {
-        logger.info(`[Subscription] Trigger ${id}`);
-
-        try {
-          const response = await fetch(event.url, {
-            method: 'POST',
-            body: JSON.stringify(message),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            logger.error(
-              `[Subscription] Failed to send data for ${id} to ${event.url}: ${response.status} ${response.statusText}`
-            );
-            callback(
-              new Error(
-                `Failed to send data for ${id} to ${event.url}: ${response.status} ${response.statusText}`
-              )
-            );
-            return;
-          }
-
-          response.body?.cancel(); // We don't care about the response body but want to free up resources
-          callback();
-        } catch (err) {
-          callback(err instanceof Error ? err : new Error(String(err)));
-        }
-      },
-    });
-
-    tx.on('error', (err) => {
-      logger.error(`[Subscription] Error on ${id}: ${err.message}`);
-      stop(id, 'Subscription errored out (tx)');
-    });
-
-    mergeTxRxStreams(id, rx, tx);
-
+    startMessaging(id, event.url, rx);
 
     clients.set(id, {
+      url: event.url,
       subscriptionName,
       rx,
-      tx,
       timeoutHandle: sofa.webhooks?.maxSubscriptionWebhookLifetimeSeconds
         ? setTimeout(() => {
             stop(id, 'Max subscription lifetime reached');
@@ -225,9 +206,10 @@ export function createSubscriptionManager(sofa: Sofa) {
     const client = clients.get(id);
 
     if (!client) {
-      throw new Error(
-        `Subscription with ID '${id}' does not exist (${terminationReason})`
+      logger.warn(
+        `Subscription with ID '${id}' does not exist (${terminationReason}), might have been already stopped. Skipping stop.`
       );
+      return { id };
     }
 
     if (sofa.webhooks?.terminationMessage && terminationReason !== null) {
@@ -253,7 +235,7 @@ export function createSubscriptionManager(sofa: Sofa) {
           },
         },
       };
-      client.tx.write(terminationMessage);
+      await sendMessage(terminationMessage, client.url);
     }
 
     if (client.timeoutHandle) {
@@ -264,8 +246,6 @@ export function createSubscriptionManager(sofa: Sofa) {
     if (client.rx.return) {
       await client.rx.return();
     }
-    // clear the sending stream since we are done
-    client.tx.end();
     // remove the client from the map
     clients.delete(id);
 
@@ -293,7 +273,7 @@ export function createSubscriptionManager(sofa: Sofa) {
       contextValue
     );
 
-    mergeTxRxStreams(event.id, rx, client.tx);
+    startMessaging(event.id, client.url, rx);
     client.rx = rx;
     return { id: event.id };
   };
