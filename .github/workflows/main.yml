@@ -26,3 +26,5 @@ jobs:
         run: yarn build
       - name: Test
         run: yarn test
+      - name: Leak Test
+        run: yarn test:leaks
