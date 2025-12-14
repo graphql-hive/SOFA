@@ -4,27 +4,29 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "next build && next-sitemap",
+    "build": "next build --webpack && next-sitemap",
     "dev": "next",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "lottie-web": "5.13.0",
-    "@theguild/components": "7.6.3",
-    "next": "15.5.6",
+    "@theguild/components": "7.6.5",
+    "next": "16.0.10",
     "next-sitemap": "4.2.3",
-    "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@theguild/tailwind-config": "0.6.4",
-    "@types/node": "22.18.11",
-    "@types/react": "19.2.2",
+    "@types/node": "24.10.4",
+    "@types/react": "19.2.7",
     "postcss-import": "16.1.1",
     "postcss-lightningcss": "1.0.2",
-    "tailwindcss": "3.4.18",
+    "tailwindcss": "3.4.19",
     "typescript": "5.9.3",
-    "sharp": "0.34.4"
+    "patch-package": "8.0.1",
+    "sharp": "0.34.5"
   },
   "resolutions": {
     "hast-util-to-estree": "^3.0.0"
