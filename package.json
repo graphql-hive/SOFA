@@ -71,7 +71,6 @@
   },
   "devDependencies": {
     "@types/qs": "6.14.0",
-    "@types/readable-stream": "4.0.22",
     "@changesets/changelog-github": "0.5.2",
     "@changesets/cli": "2.29.8",
     "@babel/core": "7.28.5",

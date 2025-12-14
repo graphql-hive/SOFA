@@ -79,7 +79,7 @@ export function createSubscriptionManager(sofa: Sofa) {
     });
   }
 
-  const readableStreamFromOperationCall = async (
+  const subscriptionIterableFromOperationCall = async (
     id: ID,
     subscriptionName: SubscriptionFieldName,
     event: StartSubscriptionEvent | UpdateSubscriptionEvent,
@@ -168,7 +168,7 @@ export function createSubscriptionManager(sofa: Sofa) {
     const id = crypto.randomUUID();
     const subscriptionName = event.subscription;
 
-    const rx = await readableStreamFromOperationCall(
+    const rx = await subscriptionIterableFromOperationCall(
       id,
       subscriptionName,
       event,
@@ -266,7 +266,7 @@ export function createSubscriptionManager(sofa: Sofa) {
       await client.rx.return();
     }
 
-    const rx = await readableStreamFromOperationCall(
+    const rx = await subscriptionIterableFromOperationCall(
       event.id,
       client.subscriptionName,
       event,

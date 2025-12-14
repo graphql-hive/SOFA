@@ -2025,13 +2025,6 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.7.tgz#50ae4353eaaddc04044279812f52c8c65857dbcb"
   integrity sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==
 
-"@types/readable-stream@4.0.22":
-  version "4.0.22"
-  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.22.tgz#882fda4f17b6580acb257df3f22ca69c05470b29"
-  integrity sha512-/FFhJpfCLAPwAcN3mFycNUa77ddnr8jTgF5VmSNetaemWB2cIlfCA9t0YTM3JAT0wOcv8D4tjPo7pkDhK3EJIg==
-  dependencies:
-    "@types/node" "*"
-
 "@types/send@*":
   version "0.17.6"
   resolved "https://registry.yarnpkg.com/@types/send/-/send-0.17.6.tgz#aeb5385be62ff58a52cd5459daa509ae91651d25"
