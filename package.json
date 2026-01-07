@@ -50,7 +50,7 @@
     "graphql": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
-    "@graphql-tools/utils": "^10.0.0",
+    "@graphql-tools/utils": "^11.0.0",
     "@whatwg-node/fetch": "^0.10.0",
     "fets": "^0.8.0",
     "ansi-colors": "^4.1.3",
