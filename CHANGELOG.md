@@ -1,5 +1,12 @@
 # Change log
 
+## 0.18.9
+
+### Patch Changes
+
+- [#1843](https://github.com/graphql-hive/SOFA/pull/1843) [`dbf4aaa`](https://github.com/graphql-hive/SOFA/commit/dbf4aaaa0efe0564d433129aa4a00b522b663837) Thanks [@renovate](https://github.com/apps/renovate)! - dependencies updates:
+  - Updated dependency [`@graphql-tools/utils@^11.0.0` ↗︎](https://www.npmjs.com/package/@graphql-tools/utils/v/11.0.0) (from `^10.0.0`, in `dependencies`)
+
 ## 0.18.8
 
 ### Patch Changes
@@ -7,7 +14,6 @@
 - [#1459](https://github.com/Urigo/SOFA/pull/1459) [`5442709`](https://github.com/Urigo/SOFA/commit/54427094ea98dde6994e14b15f38d2408c04b46f) Thanks [@ernestognw](https://github.com/ernestognw)! - Export `createSofa` and `createSofaRouter` for custom intermediate configuration
 
 - [#1596](https://github.com/Urigo/SOFA/pull/1596) [`390ecd2`](https://github.com/Urigo/SOFA/commit/390ecd21202948935a58df191b7c3095a23e3899) Thanks [@renovate](https://github.com/apps/renovate)! - dependencies updates:
-
   - Updated dependency [`@whatwg-node/fetch@^0.10.0` ↗︎](https://www.npmjs.com/package/@whatwg-node/fetch/v/0.10.0) (from `^0.9.14`, in `dependencies`)
 
 ## 0.18.5
@@ -47,7 +53,6 @@
 - [#1388](https://github.com/Urigo/SOFA/pull/1388) [`ffe6e67`](https://github.com/Urigo/SOFA/commit/ffe6e67894f40619d2ae8c99e16d23301a27756a) Thanks [@robertherber](https://github.com/robertherber)! - fix: add types to exports in package.json
 
 - [#1390](https://github.com/Urigo/SOFA/pull/1390) [`03b0ccf`](https://github.com/Urigo/SOFA/commit/03b0ccf585aaacb0aec87022151e1c126c9f225c) Thanks [@ardatan](https://github.com/ardatan)! - dependencies updates:
-
   - Updated dependency [`@whatwg-node/fetch@^0.9.14` ↗︎](https://www.npmjs.com/package/@whatwg-node/fetch/v/0.9.14) (from `^0.9.0`, in `dependencies`)
   - Updated dependency [`fets@^0.6.4` ↗︎](https://www.npmjs.com/package/fets/v/0.6.4) (from `^0.2.0`, in `dependencies`)
 
@@ -58,7 +63,6 @@
 ### Minor Changes
 
 - [`f6afa0e`](https://github.com/Urigo/SOFA/commit/f6afa0ef9866852dda2938c3c477a42df6764e81) Thanks [@ardatan](https://github.com/ardatan)! - Breaking changes:
-
   - Drop Node 14 support and require Node >16
 
   - OpenAPI options are now under `openAPI`

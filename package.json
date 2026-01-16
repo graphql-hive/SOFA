@@ -1,7 +1,7 @@
 {
   "name": "sofa-api",
   "description": "Create REST APIs with GraphQL",
-  "version": "0.18.8",
+  "version": "0.18.9",
   "type": "module",
   "buildOptions": {
     "input": "./src/index.ts"
