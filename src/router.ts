@@ -23,7 +23,7 @@ import { convertName } from './common.js';
 import { parseVariable } from './parse.js';
 import {
   type StartSubscriptionEvent,
-  SubscriptionManager,
+  createSubscriptionManager,
 } from './subscriptions.js';
 import { logger } from './logger.js';
 import {
@@ -138,7 +138,6 @@ export function createSofaRouter(sofa: Sofa) {
 
   const queryType = sofa.schema.getQueryType();
   const mutationType = sofa.schema.getMutationType();
-  const subscriptionManager = new SubscriptionManager(sofa);
 
   if (queryType) {
     Object.keys(queryType.getFields()).forEach((fieldName) => {
@@ -152,82 +151,85 @@ export function createSofaRouter(sofa: Sofa) {
     });
   }
 
-  router.route({
-    path: '/webhook',
-    method: 'POST',
-    async handler(request, serverContext) {
-      const { subscription, variables, url }: StartSubscriptionEvent =
-        await request.json();
-      try {
-        const sofaContext: DefaultSofaServerContext = Object.assign(
-          serverContext,
-          {
+  if (sofa.schema.getSubscriptionType()) {
+    const subscriptionManager = createSubscriptionManager(sofa);
+    router.route({
+      path: '/webhook',
+      method: 'POST',
+      async handler(request, serverContext) {
+        const { subscription, variables, url }: StartSubscriptionEvent =
+          await request.json();
+        try {
+          const sofaContext: DefaultSofaServerContext = Object.assign(
+            serverContext,
+            {
+              request,
+            }
+          );
+          const result = await subscriptionManager.start(
+            {
+              subscription,
+              variables,
+              url,
+            },
+            sofaContext
+          );
+          return Response.json(result);
+        } catch (error) {
+          return Response.json(error, {
+            status: 500,
+            statusText: 'Subscription failed' as any,
+          });
+        }
+      },
+    });
+
+    router.route({
+      path: '/webhook/:id',
+      method: 'POST',
+      async handler(request, serverContext) {
+        const id = request.params?.id!;
+        const body = await request.json();
+        const variables: any = body.variables;
+        try {
+          const sofaContext = Object.assign(serverContext, {
             request,
-          }
-        );
-        const result = await subscriptionManager.start(
-          {
-            subscription,
-            variables,
-            url,
-          },
-          sofaContext
-        );
-        return Response.json(result);
-      } catch (error) {
-        return Response.json(error, {
-          status: 500,
-          statusText: 'Subscription failed' as any,
-        });
-      }
-    },
-  });
+          });
+          const contextValue = await sofa.contextFactory(sofaContext);
+          const result = await subscriptionManager.update(
+            {
+              id,
+              variables,
+            },
+            contextValue
+          );
+          return Response.json(result);
+        } catch (error) {
+          return Response.json(error, {
+            status: 500,
+            statusText: 'Subscription failed to update' as any,
+          });
+        }
+      },
+    });
 
-  router.route({
-    path: '/webhook/:id',
-    method: 'POST',
-    async handler(request, serverContext) {
-      const id = request.params?.id!;
-      const body = await request.json();
-      const variables: any = body.variables;
-      try {
-        const sofaContext = Object.assign(serverContext, {
-          request,
-        });
-        const contextValue = await sofa.contextFactory(sofaContext);
-        const result = await subscriptionManager.update(
-          {
-            id,
-            variables,
-          },
-          contextValue
-        );
-        return Response.json(result);
-      } catch (error) {
-        return Response.json(error, {
-          status: 500,
-          statusText: 'Subscription failed to update' as any,
-        });
-      }
-    },
-  });
-
-  router.route({
-    path: '/webhook/:id',
-    method: 'DELETE',
-    async handler(request) {
-      const id = request.params?.id!;
-      try {
-        const result = await subscriptionManager.stop(id);
-        return Response.json(result);
-      } catch (error) {
-        return Response.json(error, {
-          status: 500,
-          statusText: 'Subscription failed to stop' as any,
-        });
-      }
-    },
-  });
+    router.route({
+      path: '/webhook/:id',
+      method: 'DELETE',
+      async handler(request) {
+        const id = request.params?.id!;
+        try {
+          const result = await subscriptionManager.stop(id);
+          return Response.json(result);
+        } catch (error) {
+          return Response.json(error, {
+            status: 500,
+            statusText: 'Subscription failed to stop' as any,
+          });
+        }
+      },
+    });
+  }
 
   return router;
 }

@@ -12,29 +12,10 @@ import type { Sofa } from './sofa.js';
 import { getOperationInfo } from './ast.js';
 import { parseVariable } from './parse.js';
 import { logger } from './logger.js';
+import { ObjMap } from 'graphql/jsutils/ObjMap.js';
 
-function isAsyncIterable(obj: any): obj is AsyncIterable<any> {
-  return typeof obj[Symbol.asyncIterator] === 'function';
-}
-
-// To start subscription:
-//   - an url that Sofa should trigger
-//   - name of a subscription
-//   - variables if needed
-//   - some sort of an auth token
-//   - Sofa should return a unique id of that subscription
-//   - respond with OK 200
-
-// To stop subscription
-//   - an id is required
-//   - respond with OK 200
-
-// To update subscription
-//   - an id is required
-//   - new set of variables
-
-export type ID = string;
-export type SubscriptionFieldName = string;
+type SubscriptionFieldName = string;
+type ID = string;
 
 export interface StartSubscriptionEvent {
   subscription: SubscriptionFieldName;
@@ -47,10 +28,6 @@ export interface UpdateSubscriptionEvent {
   variables: any;
 }
 
-export interface StopSubscriptionResponse {
-  id: ID;
-}
-
 interface BuiltOperation {
   operationName: string;
   document: DocumentNode;
@@ -58,115 +35,68 @@ interface BuiltOperation {
 }
 
 interface StoredClient {
-  name: SubscriptionFieldName;
   url: string;
-  iterator: AsyncIterator<any>;
+  subscriptionName: SubscriptionFieldName;
+  rx: AsyncIterator<any>;
+  timeoutHandle?: NodeJS.Timeout;
 }
 
-export class SubscriptionManager {
-  private operations = new Map<SubscriptionFieldName, BuiltOperation>();
-  private clients = new Map<ID, StoredClient>();
+function isAsyncIterable(obj: any): obj is AsyncIterable<any> {
+  return typeof obj[Symbol.asyncIterator] === 'function';
+}
 
-  constructor(private sofa: Sofa) {
-    this.buildOperations();
+export function createSubscriptionManager(sofa: Sofa) {
+  const subscription = sofa.schema.getSubscriptionType();
+
+  if (!subscription) {
+    throw new Error('Schema does not have subscription type');
   }
 
-  public async start(
-    event: StartSubscriptionEvent,
-    contextValue: ContextValue
-  ) {
-    const id = crypto.randomUUID();
-    const name = event.subscription;
+  const fieldMap = subscription.getFields();
+  const operations = new Map<SubscriptionFieldName, BuiltOperation>();
+  const clients = new Map<ID, StoredClient>();
 
-    if (!this.operations.has(name)) {
-      throw new Error(`Subscription '${name}' is not available`);
+  for (const field in fieldMap) {
+    const operationNode = buildOperationNodeForField({
+      kind: 'subscription' as OperationTypeNode,
+      field,
+      schema: sofa.schema,
+      models: sofa.models,
+      ignore: sofa.ignore,
+      circularReferenceDepth: sofa.depthLimit,
+    });
+    const document: DocumentNode = {
+      kind: Kind.DOCUMENT,
+      definitions: [operationNode],
+    };
+
+    const { variables, name: operationName } = getOperationInfo(document)!;
+
+    operations.set(field, {
+      operationName,
+      document,
+      variables,
+    });
+  }
+
+  const subscriptionIterableFromOperationCall = async (
+    id: ID,
+    subscriptionName: SubscriptionFieldName,
+    event: StartSubscriptionEvent | UpdateSubscriptionEvent,
+    contextValue: ContextValue
+  ) => {
+    const operation = operations.get(subscriptionName);
+    if (!operation) {
+      throw new Error(`Subscription '${subscriptionName}' is not available`);
     }
 
     logger.info(`[Subscription] Start ${id}`, event);
 
-    const result = await this.execute({
-      id,
-      name,
-      url: event.url,
-      variables: event.variables,
-      contextValue,
-    });
-
-    if (typeof result !== 'undefined') {
-      return result;
-    }
-
-    return { id };
-  }
-
-  public async stop(id: ID): Promise<StopSubscriptionResponse> {
-    logger.info(`[Subscription] Stop ${id}`);
-
-    if (!this.clients.has(id)) {
-      throw new Error(`Subscription with ID '${id}' does not exist`);
-    }
-
-    const execution = this.clients.get(id)!;
-
-    if (execution.iterator.return) {
-      execution.iterator.return();
-    }
-
-    this.clients.delete(id);
-
-    return { id };
-  }
-
-  public async update(
-    event: UpdateSubscriptionEvent,
-    contextValue: ContextValue
-  ) {
-    const { variables, id } = event;
-
-    logger.info(`[Subscription] Update ${id}`, event);
-
-    if (!this.clients.has(id)) {
-      throw new Error(`Subscription with ID '${id}' does not exist`);
-    }
-
-    const { name: subscription, url } = this.clients.get(id)!;
-
-    this.stop(id);
-
-    return this.start(
-      {
-        url,
-        subscription,
-        variables,
-      },
-      contextValue
-    );
-  }
-
-  private async execute({
-    id,
-    name,
-    url,
-    variables,
-    contextValue,
-  }: {
-    id: ID;
-    name: SubscriptionFieldName;
-    url: string;
-    variables: Record<string, any>;
-    contextValue: ContextValue;
-  }) {
-    const {
-      document,
-      operationName,
-      variables: variableNodes,
-    } = this.operations.get(name)!;
-
-    const variableValues = variableNodes.reduce((values, variable) => {
+    const variableValues = operation.variables.reduce((values, variable) => {
       const value = parseVariable({
-        value: variables[variable.variable.name.value],
+        value: event.variables[variable.variable.name.value],
         variable,
-        schema: this.sofa.schema,
+        schema: sofa.schema,
       });
 
       if (typeof value === 'undefined') {
@@ -179,97 +109,173 @@ export class SubscriptionManager {
       };
     }, {});
 
-    const execution = await this.sofa.subscribe({
-      schema: this.sofa.schema,
-      document,
-      operationName,
+    const subscriptionIterable = await sofa.subscribe({
+      schema: sofa.schema,
+      document: operation.document,
+      operationName: operation.operationName,
       variableValues,
       contextValue,
     });
 
-    if (isAsyncIterable(execution)) {
-      // successful
-
-      // add execution to clients
-      this.clients.set(id, {
-        name,
-        url,
-        iterator: execution as any,
-      });
-
-      // success
-      (async () => {
-        for await (const result of execution) {
-          await this.sendData({
-            id,
-            result,
-          });
-        }
-      })().then(
-        () => {
-          // completes
-          this.clients.delete(id);
-        },
-        (e) => {
-          logger.info(`Subscription #${id} closed`);
-          logger.error(e);
-          this.clients.delete(id);
-        }
-      );
-    } else {
-      return execution as ExecutionResult;
-    }
-  }
-
-  private async sendData({ id, result }: { id: ID; result: any }) {
-    if (!this.clients.has(id)) {
-      throw new Error(`Subscription with ID '${id}' does not exist`);
+    if (!isAsyncIterable(subscriptionIterable)) {
+      throw subscriptionIterable as ExecutionResult;
     }
 
-    const { url } = this.clients.get(id)!;
+    return subscriptionIterable;
+  };
 
-    logger.info(`[Subscription] Trigger ${id}`);
-
+  const sendMessage = async (message: any, url: string) => {
     const response = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify(result),
+      body: JSON.stringify(message),
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    await response.text();
-  }
 
-  private buildOperations() {
-    const subscription = this.sofa.schema.getSubscriptionType();
-
-    if (!subscription) {
-      return;
+    if (!response.ok) {
+      throw new Error(
+        `Failed to send data to ${url}: ${response.status} ${response.statusText}`
+      );
     }
 
-    const fieldMap = subscription.getFields();
+    response.body?.cancel(); // We don't care about the response body but want to free up resources
+  };
 
-    for (const field in fieldMap) {
-      const operationNode = buildOperationNodeForField({
-        kind: 'subscription' as OperationTypeNode,
-        field,
-        schema: this.sofa.schema,
-        models: this.sofa.models,
-        ignore: this.sofa.ignore,
-        circularReferenceDepth: this.sofa.depthLimit,
-      });
-      const document: DocumentNode = {
-        kind: Kind.DOCUMENT,
-        definitions: [operationNode],
+  const startMessaging = (id: string, url: string, rx: AsyncIterable<any>) => {
+    (async () => {
+      for await (const message of rx) {
+        try {
+          await sendMessage(message, url);
+          logger.debug(`[Subscription] Sent message to ${url}`, message);
+        } catch (error) {
+          logger.error(
+            `[Subscription] Error sending message to ${url}:`,
+            error
+          );
+          stop(id, `Subscription stopped due to delivery error`);
+          break;
+        }
+      }
+      stop(id, 'Subscription completed gracefully');
+    })();
+  };
+
+  const start = async (
+    event: StartSubscriptionEvent,
+    contextValue: ContextValue
+  ) => {
+    const id = crypto.randomUUID();
+    const subscriptionName = event.subscription;
+
+    const rx = await subscriptionIterableFromOperationCall(
+      id,
+      subscriptionName,
+      event,
+      contextValue
+    );
+
+    startMessaging(id, event.url, rx);
+
+    clients.set(id, {
+      url: event.url,
+      subscriptionName,
+      rx,
+      timeoutHandle: sofa.webhooks?.maxSubscriptionWebhookLifetimeSeconds
+        ? setTimeout(() => {
+            stop(id, 'Max subscription lifetime reached');
+          }, sofa.webhooks?.maxSubscriptionWebhookLifetimeSeconds * 1000)
+        : undefined,
+    });
+
+    return { id };
+  };
+
+  const stop = async (
+    /**
+     * Subscription ID
+     */
+    id: ID,
+    /**
+     * Reason for termination. Set to null to skip sending termination message.
+     */
+    terminationReason?: string | null
+  ) => {
+    logger.info(`[Subscription] Stop ${id}`);
+
+    const client = clients.get(id);
+
+    if (!client) {
+      logger.warn(
+        `Subscription with ID '${id}' does not exist (${terminationReason}), might have been already stopped. Skipping stop.`
+      );
+      return { id };
+    }
+
+    if (sofa.webhooks?.terminationMessage && terminationReason !== null) {
+      const termination =
+        typeof sofa.webhooks.terminationMessage === 'function'
+          ? sofa.webhooks.terminationMessage(
+              terminationReason || 'Subscription terminated'
+            )
+          : {
+              reason:
+                typeof sofa.webhooks.terminationMessage === 'boolean'
+                  ? terminationReason || 'Subscription terminated'
+                  : sofa.webhooks.terminationMessage,
+            };
+
+      const terminationMessage: ExecutionResult<
+        ObjMap<unknown>,
+        ObjMap<unknown>
+      > = {
+        extensions: {
+          webhook: {
+            termination,
+          },
+        },
       };
-
-      const { variables, name: operationName } = getOperationInfo(document)!;
-
-      this.operations.set(field, {
-        operationName,
-        document,
-        variables,
-      });
+      await sendMessage(terminationMessage, client.url);
     }
-  }
+
+    if (client.timeoutHandle) {
+      clearTimeout(client.timeoutHandle);
+    }
+
+    // this terminates the rx stream
+    if (client.rx.return) {
+      await client.rx.return();
+    }
+    // remove the client from the map
+    clients.delete(id);
+
+    return { id };
+  };
+
+  const update = async (
+    event: UpdateSubscriptionEvent,
+    contextValue: ContextValue
+  ) => {
+    logger.info(`[Subscription] Update ${event.id}`, event);
+    const client = clients.get(event.id);
+    if (!client) {
+      throw new Error(`Subscription with ID '${event.id}' does not exist`);
+    }
+
+    if (client.rx.return) {
+      await client.rx.return();
+    }
+
+    const rx = await subscriptionIterableFromOperationCall(
+      event.id,
+      client.subscriptionName,
+      event,
+      contextValue
+    );
+
+    startMessaging(event.id, client.url, rx);
+    client.rx = rx;
+    return { id: event.id };
+  };
+  return { start, stop, update };
 }

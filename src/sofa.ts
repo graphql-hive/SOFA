@@ -61,6 +61,45 @@ export interface SofaConfig {
 
   openAPI?: RouterOpenAPIOptions<any>;
   swaggerUI?: RouterSwaggerUIOptions;
+
+  /**
+   * Webhook configuration for subscriptions.
+   */
+  webhooks?: {
+    /**
+     * Maximum lifetime of a subscription webhook in seconds.
+     * After this time, the subscription will be automatically terminated.
+     * Default is never.
+     */
+    maxSubscriptionWebhookLifetimeSeconds?: number;
+    /**
+     * Message sent to the webhook URL upon subscription termination.
+     * Can be a boolean, string, or a function that returns an object with a reason.
+     * If set to `false`, no message will be sent.
+     * If set to `true`, a default message will be sent.
+     * If a string is provided, it will be used as the reason for termination.
+     * If a function is provided, it will be called with the reason and should return an object.
+     * The function can also return more fields than just reason, which will then get attached to the message. Useful for e.g. timestamps.
+     * Default is to send no message.
+     *
+     * The termination reason will be sent in the extensions field of the payload as follows:
+     * ```json
+     * {
+     *   "extensions": {
+     *     "webhook": {
+     *       "termination": {
+     *         "reason": "Max subscription lifetime reached (60s)"
+     *       }
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    terminationMessage?:
+      | boolean
+      | string
+      | ((reason: string) => { reason: string });
+  };
 }
 
 export interface Sofa {
@@ -79,6 +118,8 @@ export interface Sofa {
 
   openAPI?: RouterOpenAPIOptions<any>;
   swaggerUI?: RouterSwaggerUIOptions;
+
+  webhooks?: SofaConfig['webhooks'];
 }
 
 export function createSofa(config: SofaConfig): Sofa {

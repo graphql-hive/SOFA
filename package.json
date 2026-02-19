@@ -52,12 +52,12 @@
   "dependencies": {
     "@graphql-tools/utils": "^11.0.0",
     "@whatwg-node/fetch": "^0.10.0",
-    "fets": "^0.8.0",
     "ansi-colors": "^4.1.3",
+    "fets": "^0.8.0",
     "openapi-types": "^12.1.0",
     "param-case": "^3.0.4",
-    "title-case": "^3.0.3",
     "qs": "^6.11.2",
+    "title-case": "^3.0.3",
     "tslib": "^2.5.0"
   },
   "scripts": {
@@ -70,6 +70,7 @@
     "release": "yarn build && changeset publish"
   },
   "devDependencies": {
+    "@types/qs": "6.14.0",
     "@changesets/changelog-github": "0.5.2",
     "@changesets/cli": "2.29.8",
     "@babel/core": "7.29.0",
@@ -81,7 +82,6 @@
     "@types/node": "24.10.13",
     "@types/swagger-ui-dist": "3.30.6",
     "@types/yamljs": "0.2.34",
-    "@types/qs": "6.14.0",
     "babel-jest": "30.2.0",
     "bob-the-bundler": "7.0.1",
     "chalk": "^5.4.1",
