@@ -252,7 +252,7 @@ test('handle query params in POST requests', async () => {
   });
 });
 
-test('handle union type', async () => {
+test('handle union type', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
