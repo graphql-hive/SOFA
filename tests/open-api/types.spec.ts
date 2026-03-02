@@ -1,5 +1,4 @@
 import {
-  buildSchema,
   GraphQLObjectType,
   GraphQLInputObjectType,
 } from 'graphql';
