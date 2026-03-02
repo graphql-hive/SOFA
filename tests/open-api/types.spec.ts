@@ -9,7 +9,7 @@ import { GraphQLEmailAddress, GraphQLPositiveInt } from 'graphql-scalars';
 
 import { createSchema } from 'graphql-yoga';
 
-test('handle ObjectType', async () => {
+test('should build OpenAPI schema objects from GraphQL object types with enums, input types, and custom scalars', async () => {
   const schema = createSchema({
     typeDefs: /* GraphQL */ `
       """
