@@ -126,7 +126,7 @@ test('handle query', async () => {
   });
 });
 
-test('handle mutation', async () => {
+test('handle mutation', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
