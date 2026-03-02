@@ -196,7 +196,9 @@ test('handle tags and descriptions', async () => {
     customScalars: {},
   });
   expect(result.description).toMatch('Feed for test posts');
-  expect(result.tags).toContain('Feed' && 'Posts' && 'Test');
+  expect(result.tags).toContain('Feed');
+  expect(result.tags).toContain('Posts');
+  expect(result.tags).toContain('Test');
 });
 
 test('handle query params in POST requests', async () => {
