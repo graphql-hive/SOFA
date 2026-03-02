@@ -201,7 +201,7 @@ test('handle tags and descriptions', async () => {
   expect(result.tags).toContain('Test');
 });
 
-test('handle query params in POST requests', async () => {
+test('handle query params in POST requests', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
