@@ -65,7 +65,7 @@ const schema = buildSchema(/* GraphQL */ `
   }
 `);
 
-test('handle query', async () => {
+test('handle query', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
