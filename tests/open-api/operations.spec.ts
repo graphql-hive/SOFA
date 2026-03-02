@@ -177,7 +177,7 @@ test('handle mutation', async () => {
   });
 });
 
-test('handle tags and descriptions', async () => {
+test('handle tags and descriptions', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
