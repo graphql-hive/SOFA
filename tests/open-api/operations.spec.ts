@@ -65,7 +65,7 @@ const schema = buildSchema(/* GraphQL */ `
   }
 `);
 
-test('handle query', async () => {
+test('handle query', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
@@ -126,7 +126,7 @@ test('handle query', async () => {
   });
 });
 
-test('handle mutation', async () => {
+test('handle mutation', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
@@ -177,7 +177,7 @@ test('handle mutation', async () => {
   });
 });
 
-test('handle tags and descriptions', async () => {
+test('handle tags and descriptions', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
@@ -201,7 +201,7 @@ test('handle tags and descriptions', async () => {
   expect(result.tags).toContain('Test');
 });
 
-test('handle query params in POST requests', async () => {
+test('handle query params in POST requests', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
@@ -252,7 +252,7 @@ test('handle query params in POST requests', async () => {
   });
 });
 
-test('handle union type', async () => {
+test('handle union type', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
