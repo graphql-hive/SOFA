@@ -70,7 +70,7 @@
     "release": "yarn build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "0.5.2",
+    "@changesets/changelog-github": "0.6.0",
     "@changesets/cli": "2.29.8",
     "@babel/core": "7.29.0",
     "@babel/plugin-proposal-class-properties": "7.18.6",
