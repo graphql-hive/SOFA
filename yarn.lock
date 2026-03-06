@@ -1170,10 +1170,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@envelop/core@^5.3.0":
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/@envelop/core/-/core-5.3.2.tgz#82c0f7bea98e230e345a1f2c44cc9a1769898f2b"
-  integrity sha512-06Mu7fmyKzk09P2i2kHpGfItqLLgCq7uO5/nX4fc/iHMplWPNuAx4iYR+WXUQoFHDnP6EUbceQNQ5iyeMz9f3g==
+"@envelop/core@^5.5.1":
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/@envelop/core/-/core-5.5.1.tgz#ca30c927b3a7d7f118d36111e17b355eedae9ff4"
+  integrity sha512-3DQg8sFskDo386TkL5j12jyRAdip/8yzK3x7YGbZBgobZ4aKXrvDU0GppU0SnmrpQnNaiTUsxBs9LKkwQ/eyvw==
   dependencies:
     "@envelop/instrumentation" "^1.0.0"
     "@envelop/types" "^5.2.1"
@@ -3182,12 +3182,12 @@ graphql-scalars@1.25.0:
   dependencies:
     tslib "^2.5.0"
 
-graphql-yoga@5.18.0:
-  version "5.18.0"
-  resolved "https://registry.yarnpkg.com/graphql-yoga/-/graphql-yoga-5.18.0.tgz#e33d52851cfa4f17f177744c50197015ce58736a"
-  integrity sha512-xFt1DVXS1BZ3AvjnawAGc5OYieSe56WuQuyk3iEpBwJ3QDZJWQGLmU9z/L5NUZ+pUcyprsz/bOwkYIV96fXt/g==
+graphql-yoga@5.18.1:
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/graphql-yoga/-/graphql-yoga-5.18.1.tgz#d1e80526514b79babd12486217744ab8a625fdc6"
+  integrity sha512-GiDSlvibfY/vyurbkBOKMO+adF6bTCzKr80FYWta59s1Lx87oVo8T6Nu/0hrxrGv0SrAUkqUpcpr4Ee7XlYmBw==
   dependencies:
-    "@envelop/core" "^5.3.0"
+    "@envelop/core" "^5.5.1"
     "@envelop/instrumentation" "^1.0.0"
     "@graphql-tools/executor" "^1.5.0"
     "@graphql-tools/schema" "^10.0.11"
