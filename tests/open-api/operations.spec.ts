@@ -65,7 +65,7 @@ const schema = buildSchema(/* GraphQL */ `
   }
 `);
 
-test('handle query', () => {
+test('should build OpenAPI path for feed query with enum and nested field parameters', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
@@ -126,7 +126,7 @@ test('handle query', () => {
   });
 });
 
-test('handle mutation', () => {
+test('should build OpenAPI path with request body for mutations', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
@@ -177,7 +177,7 @@ test('handle mutation', () => {
   });
 });
 
-test('handle tags and descriptions', () => {
+test('should include custom tags and description in OpenAPI path', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
@@ -201,7 +201,7 @@ test('handle tags and descriptions', () => {
   expect(result.tags).toContain('Test');
 });
 
-test('handle query params in POST requests', () => {
+test('should extract path parameters from URL and exclude them from request body', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
@@ -252,7 +252,7 @@ test('handle query params in POST requests', () => {
   });
 });
 
-test('handle union type', () => {
+test('should build OpenAPI path with oneOf schema for union types', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
