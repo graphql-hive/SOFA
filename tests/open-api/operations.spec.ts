@@ -201,7 +201,7 @@ test('handle tags and descriptions', () => {
   expect(result.tags).toContain('Test');
 });
 
-test('handle query params in POST requests', () => {
+test('should extract path parameters from URL and exclude them from request body', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
