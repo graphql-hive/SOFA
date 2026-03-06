@@ -2032,10 +2032,10 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.5.tgz#1ef302e01cf7d2b5a0fa526790c9123bf1d06690"
   integrity sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==
 
-"@types/node@*", "@types/node@24.11.0":
-  version "24.11.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.11.0.tgz#34e8f9603ada03fdc36a532faefdb8e1bb3693a0"
-  integrity sha512-fPxQqz4VTgPI/IQ+lj9r0h+fDR66bzoeMGHp8ASee+32OSGIkeASsoZuJixsQoVef1QJbeubcPBxKk22QVoWdw==
+"@types/node@*", "@types/node@24.12.0":
+  version "24.12.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.12.0.tgz#6222e028210e5322e4f4f6767f8d88e5ea3b33d2"
+  integrity sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==
   dependencies:
     undici-types "~7.16.0"
 
@@ -2044,10 +2044,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
-"@types/qs@*", "@types/qs@6.14.0":
-  version "6.14.0"
-  resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.14.0.tgz#d8b60cecf62f2db0fb68e5e006077b9178b85de5"
-  integrity sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==
+"@types/qs@*", "@types/qs@6.15.0":
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.15.0.tgz#963ab61779843fe910639a50661b48f162bc7f79"
+  integrity sha512-JawvT8iBVWpzTrz3EGw9BTQFg3BQNmwERdKE22vlTxawwtbyUSlMppvZYKLZzB5zgACXdXxbD3m1bXaMqP/9ow==
 
 "@types/range-parser@*":
   version "1.2.7"
@@ -3200,10 +3200,10 @@ graphql-yoga@5.18.0:
     lru-cache "^10.0.0"
     tslib "^2.8.1"
 
-graphql@16.13.0:
-  version "16.13.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.13.0.tgz#726857e897e87d54412d62356ec0b6b76bfab409"
-  integrity sha512-uSisMYERbaB9bkA9M4/4dnqyktaEkf1kMHNKq/7DHyxVeWqHQ2mBmVqm5u6/FVHwF3iCNalKcg82Zfl+tffWoA==
+graphql@16.13.1:
+  version "16.13.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.13.1.tgz#38ae5c76fbc4a009e0004dca6c76c370a1da7b54"
+  integrity sha512-gGgrVCoDKlIZ8fIqXBBb0pPKqDgki0Z/FSKNiQzSGj2uEYHr1tq5wmBegGwJx6QB5S5cM0khSBpi/JFHMCvsmQ==
 
 handlebars@^4.7.8:
   version "4.7.8"
