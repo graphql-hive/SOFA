@@ -177,7 +177,7 @@ test('handle mutation', () => {
   });
 });
 
-test('handle tags and descriptions', () => {
+test('should include custom tags and description in OpenAPI path', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
