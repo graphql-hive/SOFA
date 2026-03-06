@@ -126,7 +126,7 @@ test('handle query', () => {
   });
 });
 
-test('handle mutation', () => {
+test('should build OpenAPI path with request body for mutations', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'mutation' as OperationTypeNode,
