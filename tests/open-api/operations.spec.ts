@@ -65,7 +65,7 @@ const schema = buildSchema(/* GraphQL */ `
   }
 `);
 
-test('handle query', () => {
+test('should build OpenAPI path for feed query with enum and nested field parameters', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
