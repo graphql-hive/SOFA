@@ -252,7 +252,7 @@ test('handle query params in POST requests', () => {
   });
 });
 
-test('handle union type', () => {
+test('should build OpenAPI path with oneOf schema for union types', () => {
   const operation = buildOperationNodeForField({
     schema,
     kind: 'query' as OperationTypeNode,
