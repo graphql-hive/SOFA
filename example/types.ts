@@ -26,6 +26,10 @@ export const typeDefs = /* GraphQL */ `
     LEGACY
   }
 
+  """
+  A User type represents a user in the system. It contains information about the user's name, their favorite pizza, book, and food, as well as a shelf of books they own.
+  \`Lorem Ipsum\` is simply dummy text of the printing and typesetting industry. It has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+  """
   type User {
     id: ID!
     name: String!

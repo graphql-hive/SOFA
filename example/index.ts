@@ -25,6 +25,28 @@ const app = useSofa({
       version: '3.0.0',
     },
   },
+  scalarUI: {
+    theme: 'saturn',
+  },
+  routes: {
+    'Query.me': {
+      description: 'Returns the current user',
+      tags: ['User'],
+    },
+    'Query.users': {
+      description: 'Returns a list of all users',
+      tags: ['User'],
+    },
+    'Query.user': {
+      description: 'Returns a user by ID',
+    },
+    'Query.books': {
+      description: 'Returns a list of all books',
+    },
+    'Query.book': {
+      description: 'Returns a book by ID',
+    },
+  },
 });
 
 app.route({
@@ -63,6 +85,7 @@ server.listen(port, () => {
 
   console.log(`
     ${chalk.bold('Swagger UI:')}     ${printUrl('/docs')}
+    ${chalk.bold('Scalar UI:')}      ${printUrl('/api-reference')}
     ${chalk.bold('GraphiQL:')}        ${printUrl('/graphql')}
 
     ${chalk.bold('Queries:')}
