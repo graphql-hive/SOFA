@@ -1,8 +1,8 @@
 import { createGraphQLError } from 'graphql-yoga';
 
 const pizzas = [
-  { id: 1, dough: 'pan', toppings: ['cheese'] },
-  { id: 2, dough: 'classic', toppings: ['ham'] },
+  { id: 1, dough: 'THICK', toppings: ['cheese'] },
+  { id: 2, dough: 'THIN', toppings: ['ham'] },
 ];
 const books = [
   { id: 1, title: 'Book A', type: 'AUDIO' },
