@@ -39,7 +39,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "Urigo/sofa"
+    "url": "git+https://github.com/graphql-hive/sofa.git"
   },
   "author": {
     "name": "Uri Goldshtein",
