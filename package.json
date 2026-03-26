@@ -67,7 +67,8 @@
     "build": "bob build --single",
     "test": "jest --no-watchman",
     "test:leaks": "jest --no-watchman --detectOpenHandles --detectLeaks",
-    "release": "yarn build && changeset publish"
+    "release": "yarn build && changeset publish",
+    "version": "changeset version"
   },
   "devDependencies": {
     "@changesets/changelog-github": "0.6.0",
