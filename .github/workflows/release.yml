@@ -20,8 +20,8 @@ jobs:
     if: github.ref == 'refs/heads/master'
     uses: the-guild-org/shared-config/.github/workflows/release-stable.yml@v1
     with:
-      releaseScript: run release
-      versionScript: run version
+      releaseScript: release
+      versionScript: version
       node-version-file: .node-version
     secrets:
       githubToken: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -53,3 +53,20 @@ jobs:
       githubToken: ${{ secrets.BOT_GITHUB_TOKEN }}
       npmToken: ${{ secrets.NPM_TOKEN }}
 
+  release-candidate:
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    if:
+      ${{ github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.title == 'Upcoming Release Changes' }}
+    uses: the-guild-org/shared-config/.github/workflows/release-snapshot.yml@v1
+    with:
+      npmTag: rc
+      buildScript: build
+      node-version-file: .node-version
+      restoreDeletedChangesets: true
+    secrets:
+      githubToken: ${{ secrets.BOT_GITHUB_TOKEN }}
+      npmToken: ${{ secrets.NPM_TOKEN }}
