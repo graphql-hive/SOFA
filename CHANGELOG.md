@@ -1,5 +1,11 @@
 # Change log
 
+## 0.18.10
+
+### Patch Changes
+
+- [#1852](https://github.com/graphql-hive/SOFA/pull/1852) [`dbdf135`](https://github.com/graphql-hive/SOFA/commit/dbdf135577eb4f34e1793b6e25b3d1032c2750db) Thanks [@adambenhassen](https://github.com/adambenhassen)! - Export type conversion utilities (`resolveFieldType`, `buildSchemaObjectFromType`, `mapToPrimitive`) from the public API
+
 ## 0.18.9
 
 ### Patch Changes
