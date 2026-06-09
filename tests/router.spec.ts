@@ -656,6 +656,25 @@ test('should respect tags and descriptions', () => {
   expect(sofa.openAPIDocument.paths?.['/bar']?.post?.tags).toEqual(['bar']);
 });
 
+test('should serve Scalar UI at configured endpoint', async () => {
+  const sofa = useSofa({
+    basePath: '/api',
+    schema: createSchema({
+      typeDefs: /* GraphQL */ `
+        type Query {
+          hello: String
+        }
+      `,
+      resolvers: { Query: { hello: () => 'world' } },
+    }),
+    scalarUI: { endpoint: '/api-reference' },
+  });
+
+  const res = await sofa.fetch('http://localhost:4000/api/api-reference');
+  expect(res.status).toBe(200);
+  expect(res.headers.get('content-type')).toContain('text/html');
+});
+
 // test('should catch json parsing errors on query params and return Bad Request/400 error', async () => {
 //   const spy = jest.fn();
 //   const sofa = useSofa({

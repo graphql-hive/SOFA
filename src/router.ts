@@ -44,6 +44,7 @@ import {
 } from './open-api/operations.js';
 import { buildSchemaObjectFromType } from './open-api/types.js';
 import { parse as qsParse } from 'qs';
+import { getHtmlDocument } from '@scalar/core/libs/html-rendering';
 
 export type ErrorHandler = (errors: ReadonlyArray<any>) => Response;
 
@@ -135,6 +136,26 @@ export function createSofaRouter(sofa: Sofa) {
     swaggerUI: sofa.swaggerUI,
     landingPage: false,
   });
+
+  if (sofa.scalarUI) {
+    const { endpoint, specUrl, ...scalarConfig } = sofa.scalarUI;
+    const resolvedEndpoint = endpoint ?? '/api-reference';
+    const resolvedSpecUrl = specUrl ?? `${sofa.basePath || ''}/openapi.json`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const html = getHtmlDocument({
+      url: resolvedSpecUrl,
+      ...scalarConfig,
+    } as any);
+    router.route({
+      path: resolvedEndpoint,
+      method: 'GET',
+      handler() {
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        });
+      },
+    });
+  }
 
   const queryType = sofa.schema.getQueryType();
   const mutationType = sofa.schema.getMutationType();
@@ -286,6 +307,7 @@ function createQueryRoute({
       responseStatus: route.responseStatus,
     }),
     tags: route.tags,
+    description: route.description,
     handler: useHandler({ info, route, fieldName, sofa, operation }),
   });
 

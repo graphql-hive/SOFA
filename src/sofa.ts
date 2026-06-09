@@ -39,6 +39,44 @@ export interface Route {
   responseStatus: StatusCode;
 }
 
+/**
+ * Configuration options for the Scalar API Reference UI.
+ * Pass this as `scalarUI` in `SofaConfig` to enable the Scalar UI endpoint.
+ */
+export interface ScalarUIOptions {
+  /** Path at which the Scalar UI is served. Defaults to '/api-reference'. */
+  endpoint?: string;
+  /**
+   * URL of the OpenAPI spec to display.
+   * Defaults to '<basePath>/openapi.json'.
+   */
+  specUrl?: string;
+  /** Theme name (e.g. 'default', 'moon', 'purple', 'solarized', 'bluePlanet', 'saturn', 'kepler', 'mars', 'deepSpace', 'laserwave', 'alternate', 'none'). */
+  theme?: string;
+  /** Enable dark mode. */
+  darkMode?: boolean;
+  /** Layout style: 'modern' (default) or 'classic'. */
+  layout?: 'modern' | 'classic';
+  /** Show or hide the sidebar. Defaults to true. */
+  showSidebar?: boolean;
+  /** Hide the models section. */
+  hideModels?: boolean;
+  /** Hide the "Try it" / test request button. */
+  hideTestRequestButton?: boolean;
+  /** Hide the dark mode toggle. */
+  hideDarkModeToggle?: boolean;
+  /** Hide the search bar. */
+  hideSearch?: boolean;
+  /** Inject custom CSS into the Scalar UI page. */
+  customCss?: string;
+  /** HTML page title shown in the browser tab. */
+  pageTitle?: string;
+  /** Override the CDN URL used to load Scalar's frontend bundle. */
+  cdn?: string;
+  /** Proxy URL to avoid CORS issues when sending test requests. */
+  proxyUrl?: string;
+}
+
 export interface SofaConfig {
   basePath: string;
   schema: GraphQLSchema;
@@ -61,6 +99,7 @@ export interface SofaConfig {
 
   openAPI?: RouterOpenAPIOptions<any>;
   swaggerUI?: RouterSwaggerUIOptions;
+  scalarUI?: ScalarUIOptions;
 }
 
 export interface Sofa {
@@ -79,6 +118,7 @@ export interface Sofa {
 
   openAPI?: RouterOpenAPIOptions<any>;
   swaggerUI?: RouterSwaggerUIOptions;
+  scalarUI?: ScalarUIOptions;
 }
 
 export function createSofa(config: SofaConfig): Sofa {

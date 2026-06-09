@@ -13,7 +13,11 @@
     "importHelpers": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@scalar/core/libs/html-rendering": ["./node_modules/@scalar/core/dist/libs/html-rendering"]
+    }
   },
   "exclude": ["node_modules", "dist"]
 }
