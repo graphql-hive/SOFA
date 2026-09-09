@@ -1,8 +1,9 @@
 ---
-description: 'Improve error handling in GraphQL with Sofa. Learn how to add a custom errorHandler function to log and format errors for a better user experience. #GraphQL #Sofa'
+description: 'Improve error handling in GraphQL with Sofa. Learn how to add a
+  custom errorHandler function to log and format errors for a better user
+  experience. #GraphQL #Sofa'
+title: Error Handling
 ---
-
-# Error Handling
 
 By default, Sofa returns a response that includes JSON representation of thrown error object from GraphQL with HTTP status code 500. But, you can enhance error handler by adding your `errorHandler` function.
 
@@ -48,7 +49,7 @@ console.log(data); // {"errors":[{"message":"Expected type String, found 1."}]}
 
 Just like GraphQL Yoga's [error handling](https://the-guild.dev/graphql/yoga-server/docs/features/error-masking#modifying-http-status-codes-and-headers) , SOFA respects the status code and headers provided in the error extensions.
 
-```ts filename="GraphQL Error with http extensions." {6-11}
+```ts title="GraphQL Error with http extensions." {6-11}
 throw new GraphQLError(
   `User with id '${args.byId}' not found.`,
   // error extensions
@@ -143,7 +144,7 @@ createServer(
 ).listen(4000);
 ```
 
-In this case if you make a request to `/api/posts` without a valid `Authorization` header, 
+In this case if you make a request to `/api/posts` without a valid `Authorization` header,
 you will get a response with `401` status code and `WWW-Authenticate` in the response headers.
 But the response body will contain the data and errors.
 
